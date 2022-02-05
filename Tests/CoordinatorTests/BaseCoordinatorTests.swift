@@ -3,6 +3,17 @@ import CoordinatorAPI
 @testable import Coordinator
 
 final class BaseCoordinatorTests: XCTestCase {
+
+    override func setUp() {
+        super.setUp()
+        baseCoordinatorVerboseLogsEnabled = true
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        baseCoordinatorVerboseLogsEnabled = false
+    }
+
     func testInitWithChildrenThenChildCountIsSame() {
         // Given: BaseCoordinator instance
         let child = BaseCoordinator<UINavigationController>()

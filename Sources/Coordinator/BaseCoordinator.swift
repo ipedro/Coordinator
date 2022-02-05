@@ -10,7 +10,7 @@
 //  The above copyright notice and this permission notice shall be included in all
 //  copies or substantial portions of the Software.
 //  
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  THE SOFTWARE IS PROVIDED "AS IS", WorITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -22,8 +22,12 @@
 import CoordinatorAPI
 import Foundation
 
+public var kCoordinatorVerboseLogsEnabled = false
+
 open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
     private let identifier = UUID()
+
+    public var debugLogs: Bool = kCoordinatorVerboseLogsEnabled
 
     open weak var parent: CoordinatorProtocol?
 
@@ -41,21 +45,37 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
         coordinator.parent = self
         
         for child in children where child === coordinator {
+            if debugLogs { print(debugDescription, "couldn't add child coordinator. \(coordinator.debugDescription) is already added") }
             return
         }
         
         children.append(coordinator)
+        if debugLogs {
+            print(debugDescription, #function)
+            print(debugDescription, children)
+        }
     }
     
     open func removeChild(_ coordinator: CoordinatorProtocol) {
         if let index = children.firstIndex(where: { $0 === coordinator }) {
             let child = children.remove(at: index)
             child.parent = nil
+            if debugLogs {
+                print(debugDescription, #function)
+                print(debugDescription, children)
+            }
+        }
+        else {
+            if debugLogs { print(debugDescription, "child coordinator doesn't exist \(coordinator.debugDescription). Ignoring...") }
         }
     }
     
     open func removeAllChildren() {
-        children.forEach { removeChild($0) }
+        if debugLogs {
+            print(debugDescription, #function)
+            print(debugDescription, children)
+        }
+        children.removeAll()
     }
 
     public static func == (lhs: BaseCoordinator<StartType>, rhs: BaseCoordinator<StartType>) -> Bool {
@@ -65,4 +85,8 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(identifier)
     }
+}
+
+private extension CoordinatorProtocol {
+    var debugDescription: String { String(describing: self) }
 }
