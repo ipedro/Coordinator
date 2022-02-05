@@ -21,7 +21,7 @@
 
 import Foundation
 
-open class BaseCoordinator<StartType>: NSObject {
+open class BaseCoordinator<StartType>: NSObject, CoordinatorProtocol {
     open weak var parent: CoordinatorProtocol?
     
     open private(set) var children: [CoordinatorProtocol] = []
@@ -36,11 +36,9 @@ open class BaseCoordinator<StartType>: NSObject {
         
         children.forEach { addChild($0) }
     }
-}
 
-// MARK: - CoordinatorProtocol
+    // MARK: - CoordinatorProtocol
 
-extension BaseCoordinator: CoordinatorProtocol {
     open func addChild(_ coordinator: CoordinatorProtocol) {
         coordinator.parent = self
         
