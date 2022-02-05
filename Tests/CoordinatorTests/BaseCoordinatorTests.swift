@@ -1,4 +1,5 @@
 import XCTest
+import CoordinatorAPI
 @testable import Coordinator
 
 final class BaseCoordinatorTests: XCTestCase {

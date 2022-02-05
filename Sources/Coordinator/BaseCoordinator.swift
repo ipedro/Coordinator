@@ -19,21 +19,19 @@
 //  SOFTWARE.
 
 
+import CoordinatorAPI
 import Foundation
 
-open class BaseCoordinator<StartType>: NSObject, CoordinatorProtocol {
+open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
+    private let identifier = UUID()
+
     open weak var parent: CoordinatorProtocol?
-    
+
     open private(set) var children: [CoordinatorProtocol] = []
     
-    public init(
-        parent: CoordinatorProtocol? = nil,
-        children: [CoordinatorProtocol] = []
-    ) {
+    public init(parent: CoordinatorProtocol? = nil,
+                children: [CoordinatorProtocol] = []) {
         self.parent = parent
-
-        super.init()
-        
         children.forEach { addChild($0) }
     }
 
@@ -58,5 +56,13 @@ open class BaseCoordinator<StartType>: NSObject, CoordinatorProtocol {
     
     open func removeAllChildren() {
         children.forEach { removeChild($0) }
+    }
+
+    public static func == (lhs: BaseCoordinator<StartType>, rhs: BaseCoordinator<StartType>) -> Bool {
+        lhs.identifier == rhs.identifier
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
     }
 }

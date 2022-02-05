@@ -25,5 +25,7 @@ import UIKit
 public protocol ContainerViewControllerProtocol: UIViewController {}
 
 extension UINavigationController: ContainerViewControllerProtocol {}
+
 extension UISplitViewController: ContainerViewControllerProtocol {}
+
 extension UITabBarController: ContainerViewControllerProtocol {}

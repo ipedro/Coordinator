@@ -20,6 +20,7 @@
 
 
 import XCTest
+import CoordinatorAPI
 @testable import Coordinator
 
 final class SequenceCoordinatorProtocolTests: XCTestCase {

@@ -19,6 +19,7 @@
 //  SOFTWARE.
 
 import UIKit
+import CoordinatorAPI
 @testable import Coordinator
 
 final class ContainerViewControllerCoordinatorMock: Coordinator<ContainerViewController> {

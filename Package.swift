@@ -9,16 +9,24 @@ let package = Package(
             name: "Coordinator",
             targets: ["Coordinator"]
         ),
+        .library(
+            name: "CoordinatorAPI",
+            targets: ["CoordinatorAPI"]
+        ),
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "Coordinator",
+            name: "CoordinatorAPI",
             dependencies: []
+        ),
+        .target(
+            name: "Coordinator",
+            dependencies: ["CoordinatorAPI"]
         ),
         .testTarget(
             name: "CoordinatorTests",
-            dependencies: ["Coordinator"]
+            dependencies: ["CoordinatorAPI", "Coordinator"]
         ),
     ]
 )

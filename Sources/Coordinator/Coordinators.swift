@@ -19,6 +19,7 @@
 //  SOFTWARE.
 
 
+import CoordinatorAPI
 import UIKit
 
 public typealias Coordinator<StartType> = BaseCoordinator<StartType> & StartProtocol
