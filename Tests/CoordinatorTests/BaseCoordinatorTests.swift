@@ -6,12 +6,12 @@ final class BaseCoordinatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        baseCoordinatorVerboseLogsEnabled = true
+        kCoordinatorVerboseLogsEnabled = true
     }
 
     override func tearDown() {
         super.tearDown()
-        baseCoordinatorVerboseLogsEnabled = false
+        kCoordinatorVerboseLogsEnabled = false
     }
 
     func testInitWithChildrenThenChildCountIsSame() {

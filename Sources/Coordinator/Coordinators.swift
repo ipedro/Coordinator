@@ -33,3 +33,5 @@ public typealias SplitViewCoordinator   = Coordinator<UISplitViewController>
 public typealias TabBarCoordinator      = Coordinator<UITabBarController>
 
 public typealias ViewCoordinator        = Coordinator<UIViewController>
+
+public typealias RootCoordinator        = Coordinator<RootViewControllerProtocol>

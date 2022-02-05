@@ -45,7 +45,9 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
         coordinator.parent = self
         
         for child in children where child === coordinator {
-            if debugLogs { print(debugDescription, "couldn't add child coordinator. \(coordinator.debugDescription) is already added") }
+            if debugLogs {
+                print(debugDescription, "couldn't add child coordinator. \(coordinator.debugDescription) is already added")
+            }
             return
         }
         
@@ -66,16 +68,20 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
             }
         }
         else {
-            if debugLogs { print(debugDescription, "child coordinator doesn't exist \(coordinator.debugDescription). Ignoring...") }
+            if debugLogs {
+                print(debugDescription, "child coordinator doesn't exist \(coordinator.debugDescription). Ignoring...")
+            }
         }
     }
     
     open func removeAllChildren() {
+        children.forEach { $0.parent = nil }
+        children.removeAll()
+
         if debugLogs {
             print(debugDescription, #function)
             print(debugDescription, children)
         }
-        children.removeAll()
     }
 
     public static func == (lhs: BaseCoordinator<StartType>, rhs: BaseCoordinator<StartType>) -> Bool {

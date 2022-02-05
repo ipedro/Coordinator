@@ -28,7 +28,7 @@ public extension StartProtocol where Self: CoordinatorProtocol, StartType: UIVie
     /// - Parameters:
     ///   - coordinator: A Coordinator to be added as child.
     ///   - animated: Pass true to animate the presentation; otherwise, pass false.
-    func start<T: CoordinatorStartProtocol>(presenting coordinator: T, animated: Bool) where T.StartType: ContainerViewControllerProtocol {
+    func start<T: CoordinatorStartProtocol>(presenting coordinator: T, animated: Bool) where T.StartType: RootViewControllerProtocol {
         addChild(coordinator)
         
         let startViewController = coordinator.start()
@@ -37,9 +37,9 @@ public extension StartProtocol where Self: CoordinatorProtocol, StartType: UIVie
     }
 }
 
-// MARK: - ContainerViewControllerProtocol based StartType
+// MARK: - RootViewControllerProtocol based StartType
 
-public extension StartProtocol where Self: CoordinatorProtocol, StartType: ContainerViewControllerProtocol {
+public extension StartProtocol where Self: CoordinatorProtocol, StartType: RootViewControllerProtocol {
     /// Adds the child Coordinator to its children and then pushes the starting view controller onto the navigation controller's stack and updates the display.
     /// - Parameters:
     ///   - coordinator: A Coordinator to be added as child.
@@ -75,7 +75,7 @@ public extension StartProtocol where Self: CoordinatorProtocol, StartType: UINav
 public extension StartProtocol where Self: CoordinatorProtocol, StartType: UIWindow {
     /// Replaces existing children with the child coordinator and installs the starting view controller’s view as the content view of the window.
     /// - Parameter coordinator: A Coordinator to be added as child.
-    func start<T: CoordinatorStartProtocol>(root coordinator: T) where T.StartType: ContainerViewControllerProtocol {
+    func start<T: CoordinatorStartProtocol>(root coordinator: T) where T.StartType: RootViewControllerProtocol {
         removeAllChildren()
         
         addChild(coordinator)
@@ -90,7 +90,7 @@ public extension StartProtocol where Self: CoordinatorProtocol, StartType: UIWin
     /// - Parameters:
     ///   - coordinator: A Coordinator to be added as child.
     ///   - animated: Pass true to animate the presentation; otherwise, pass false.
-    func start<T: CoordinatorStartProtocol>(presenting coordinator: T, animated: Bool) where T.StartType: ContainerViewControllerProtocol {
+    func start<T: CoordinatorStartProtocol>(presenting coordinator: T, animated: Bool) where T.StartType: RootViewControllerProtocol {
         addChild(coordinator)
         
         let startRootViewController = coordinator.start()

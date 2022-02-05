@@ -21,11 +21,16 @@
 
 import UIKit
 
+@available(*, deprecated, renamed: "RootViewControllerProtocol")
+typealias ContainerViewControllerProtocol = RootViewControllerProtocol
+
 /// Navigation controllers, split view controller, and tab bar controllers conform to this protocol by defauilt.
-public protocol ContainerViewControllerProtocol: UIViewController {}
+public protocol RootViewControllerProtocol: UIViewController {}
 
 extension UINavigationController: ContainerViewControllerProtocol {}
 
 extension UISplitViewController: ContainerViewControllerProtocol {}
 
 extension UITabBarController: ContainerViewControllerProtocol {}
+
+extension UIAlertController: ContainerViewControllerProtocol {}
