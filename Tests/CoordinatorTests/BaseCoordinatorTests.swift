@@ -108,6 +108,25 @@ final class BaseCoordinatorTests: XCTestCase {
         XCTAssertNil(firstChild.parent)
         XCTAssertTrue(secondChild.parent === sut)
     }
+
+    func testRemoveChildrenOwnedByAnotherCoordinatorThenChildrenAreNotRemoved() {
+        // Given: BaseCoordinator instance with two child coordinators
+        let firstChild  = BaseCoordinator<UIViewController>()
+        let secondChild = BaseCoordinator<UINavigationController>()
+
+        let anotherCoordinator = BaseCoordinator<Void>(children: [firstChild, secondChild])
+
+        let sut = BaseCoordinator<Void>()
+
+        // When: remove children
+        sut.removeChild(firstChild)
+        sut.removeChild(secondChild)
+
+        // Then: children are not removed
+        XCTAssertEqual(anotherCoordinator.children.count, 2)
+        XCTAssertTrue(firstChild.parent === anotherCoordinator)
+        XCTAssertTrue(secondChild.parent === anotherCoordinator)
+    }
     
     func testRemoveAllChildrenThenChildrenCountIsZero() {
         // Given: BaseCoordinator instance with two child coordinators

@@ -27,10 +27,10 @@ typealias ContainerViewControllerProtocol = RootViewControllerProtocol
 /// Navigation controllers, split view controller, and tab bar controllers conform to this protocol by defauilt.
 public protocol RootViewControllerProtocol: UIViewController {}
 
-extension UINavigationController: ContainerViewControllerProtocol {}
+extension UINavigationController: RootViewControllerProtocol {}
 
-extension UISplitViewController: ContainerViewControllerProtocol {}
+extension UISplitViewController: RootViewControllerProtocol {}
 
-extension UITabBarController: ContainerViewControllerProtocol {}
+extension UITabBarController: RootViewControllerProtocol {}
 
-extension UIAlertController: ContainerViewControllerProtocol {}
+extension UIAlertController: RootViewControllerProtocol {}

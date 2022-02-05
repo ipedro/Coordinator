@@ -32,7 +32,7 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
     open weak var parent: CoordinatorProtocol?
 
     open private(set) var children: [CoordinatorProtocol] = []
-    
+
     public init(parent: CoordinatorProtocol? = nil,
                 children: [CoordinatorProtocol] = []) {
         self.parent = parent
@@ -46,41 +46,50 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
         
         for child in children where child === coordinator {
             if debugLogs {
-                print(debugDescription, "couldn't add child coordinator. \(coordinator.debugDescription) is already added")
+                print("⚠️", className, "couldn't add child coordinator. \(coordinator.className) is already added")
             }
             return
         }
         
         children.append(coordinator)
+
         if debugLogs {
-            print(debugDescription, #function)
-            print(debugDescription, children)
+            print("✅", className, "added", coordinator.className, "(\(children.count) children total)")
         }
     }
     
     open func removeChild(_ coordinator: CoordinatorProtocol) {
-        if let index = children.firstIndex(where: { $0 === coordinator }) {
-            let child = children.remove(at: index)
-            child.parent = nil
+        guard coordinator.parent == nil || coordinator.parent === self else {
             if debugLogs {
-                print(debugDescription, #function)
-                print(debugDescription, children)
+                print("⚠️", className, "can't remove,", coordinator.className, "because it's owned by \(String(describing: coordinator.parent?.className))")
             }
+            return
+        }
+
+        coordinator.parent = nil
+
+        if let index = children.firstIndex(where: { $0 === coordinator }) {
+            children.remove(at: index)
+
+            if debugLogs {
+                print("🗑", className, "removed", coordinator.className, "(\(children.count) children total)")
+            }
+
         }
         else {
             if debugLogs {
-                print(debugDescription, "child coordinator doesn't exist \(coordinator.debugDescription). Ignoring...")
+                print("⚠️", className, "can't remove, coordinator isn't a child", coordinator.className)
             }
         }
     }
-    
+
     open func removeAllChildren() {
         children.forEach { $0.parent = nil }
         children.removeAll()
 
         if debugLogs {
-            print(debugDescription, #function)
-            print(debugDescription, children)
+            print(className, #function)
+            print(className, children)
         }
     }
 
@@ -93,6 +102,8 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
     }
 }
 
+// MARK: - Private Helpers
+
 private extension CoordinatorProtocol {
-    var debugDescription: String { String(describing: self) }
+    var className: String { "'\(type(of: self))'" }
 }
