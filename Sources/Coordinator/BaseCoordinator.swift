@@ -41,6 +41,8 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
 
     // MARK: - CoordinatorProtocol
 
+    open func didAddChild(_ coordinator: CoordinatorProtocol) {}
+
     open func addChild(_ coordinator: CoordinatorProtocol) {
         coordinator.parent = self
         
@@ -52,11 +54,14 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
         }
         
         children.append(coordinator)
+        didAddChild(coordinator)
 
         if debugLogs {
             print("✅", className, "added", coordinator.className, "(\(children.count) children total)")
         }
     }
+
+    open func didRemoveChild(_ coordinator: CoordinatorProtocol) {}
     
     open func removeChild(_ coordinator: CoordinatorProtocol) {
         guard coordinator.parent == nil || coordinator.parent === self else {
@@ -70,11 +75,11 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
 
         if let index = children.firstIndex(where: { $0 === coordinator }) {
             children.remove(at: index)
+            didRemoveChild(coordinator)
 
             if debugLogs {
                 print("🗑", className, "removed", coordinator.className, "(\(children.count) children total)")
             }
-
         }
         else {
             if debugLogs {
@@ -83,10 +88,14 @@ open class BaseCoordinator<StartType>: CoordinatorProtocol, Hashable {
         }
     }
 
+    open func didRemoveAllChildren(_ coordinators: [CoordinatorProtocol]) {}
+
     open func removeAllChildren() {
+        let oldValue = children
         children.forEach { $0.parent = nil }
         children.removeAll()
-
+        didRemoveAllChildren(oldValue)
+        
         if debugLogs {
             print(className, #function)
             print(className, children)
