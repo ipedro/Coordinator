@@ -21,7 +21,7 @@
 import UIKit
 
 public extension UIViewController {
-    var topViewController: UIViewController {
-        presentedViewController?.topViewController ?? self
+    var topPresentedViewController: UIViewController {
+        presentedViewController?.topPresentedViewController ?? self
     }
 }

@@ -25,14 +25,14 @@ import XCTest
 final class StartableCoordinatorProtocolTests: XCTestCase {
     func testStartContainerViewControllerCoordinatorPresentingFromViewControllerCoordinatorThenIsPresented() {
         // Given: view controller coordinator
-        let sut = ViewControllerCoordinatorMock(presenter: UIView())
+        let sut = ViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
 
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = sut.start()
         window.makeKeyAndVisible()
 
         // When: starts presenting child
-        let child = ContainerViewControllerCoordinatorMock(presenter: UIView())
+        let child = ContainerViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
         sut.start(presenting: child, animated: false)
 
         // Then: child start is presented
@@ -43,7 +43,7 @@ final class StartableCoordinatorProtocolTests: XCTestCase {
 
     func testStartViewControllerCoordinatorPushingInNavigationControllerFromContainerViewControllerCoordinatorThenIsPushed() {
         // Given: root view controller coordinator
-        let sut = ContainerViewControllerCoordinatorMock(presenter: UIView())
+        let sut = ContainerViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
 
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = sut.start()
@@ -53,7 +53,7 @@ final class StartableCoordinatorProtocolTests: XCTestCase {
         let navigationController = UINavigationController(rootViewController: UIViewController())
         sut.start().present(navigationController, animated: false)
 
-        let child = ViewControllerCoordinatorMock(presenter: UIView())
+        let child = ViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
 
         sut.start(pushing: child, in: navigationController, animated: false)
 
@@ -66,14 +66,14 @@ final class StartableCoordinatorProtocolTests: XCTestCase {
 
     func testStartViewControllerCoordinatorPushingFromNavigationControllerCoordinatorStartThenIsPushed() {
         // Given: navigation view controller coordinator
-        let sut = NavigationControllerCoordinatorMock(presenter: UIView())
+        let sut = NavigationControllerCoordinatorMock(presenter: UIView(), dependencies: ())
 
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = sut.start()
         window.makeKeyAndVisible()
 
         // When: pushes child
-        let child = ViewControllerCoordinatorMock(presenter: UIView())
+        let child = ViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
 
         sut.start(pushing: child, animated: false)
 
@@ -87,14 +87,14 @@ final class StartableCoordinatorProtocolTests: XCTestCase {
     func testStartContainerViewControllerCoordinatorInRootFromWindowCoordinatorStartThenIsRoot() {
         // Given: window coordinator with children
         let sut = WindowCoordinatorMock(
-            presenter: UIView(),
+            presenter: UIView(), dependencies: (),
             children: [
-                ContainerViewControllerCoordinatorMock(presenter: UIView()),
-                ContainerViewControllerCoordinatorMock(presenter: UIView())
+                ContainerViewControllerCoordinatorMock(presenter: UIView(), dependencies: ()),
+                ContainerViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
             ])
 
         // When: starts child as root
-        let child = ContainerViewControllerCoordinatorMock(presenter: UIView())
+        let child = ContainerViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
         sut.start(root: child)
 
         // Then: child start is window root view controller
@@ -105,11 +105,11 @@ final class StartableCoordinatorProtocolTests: XCTestCase {
 
     func testStartContainerViewControllerCoordinatorPresentingFromRootFromWindowCoordinatorStartThenIsPushed() {
         // Given: window coordinator
-        let sut = WindowCoordinatorMock(presenter: UIView())
+        let sut = WindowCoordinatorMock(presenter: UIView(), dependencies: ())
         sut.start().rootViewController = UIViewController()
 
         // When: starts pushing child
-        let child = ContainerViewControllerCoordinatorMock(presenter: UIView())
+        let child = ContainerViewControllerCoordinatorMock(presenter: UIView(), dependencies: ())
         sut.start(presenting: child, animated: false)
 
         // Then: child start is presented

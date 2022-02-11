@@ -16,8 +16,8 @@ final class CoordinatorTests: XCTestCase {
 
     func testInitWithChildrenThenChildCountIsSame() {
         // Given: Coordinator instance
-        let child = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
-        let sut   = Coordinator<Void, UIView, UIWindow>(presenter: UIView(), children: [child])
+        let child = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
+        let sut   = Coordinator<Void, UIView, UIWindow>(presenter: UIView(), dependencies: (), children: [child])
         
         // Then: Object is equal to itself
         XCTAssertEqual(sut.children.count, 1)
@@ -26,7 +26,7 @@ final class CoordinatorTests: XCTestCase {
 
     func testRemoveFromParentThenRemoveChildIsCalledOnParent() {
         // Given: Coordinator instance
-        let child = Coordinator<Void, UIView, UIWindow>(presenter: UIView())
+        let child = Coordinator<Void, UIView, UIWindow>(presenter: UIView(), dependencies: ())
         let sut = CoordinatorProtocolMock(children: child)
 
         // When: is removed from parent
@@ -40,7 +40,7 @@ final class CoordinatorTests: XCTestCase {
     
     func testWhenAddCoordinatorToSetMultipleTimesAndCountIsOne() {
         // Given: Coordinator instance
-        let sut = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
+        let sut = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
         
         // When: add coordinator to set
         var set = Set<Coordinator<Void, UIView, UINavigationController>>()
@@ -54,8 +54,8 @@ final class CoordinatorTests: XCTestCase {
     
     func testEqualityWithTheDifferentObjectsThenIsNotEqual() {
         // Given: two different Coordinator instances of the same type
-        let lhs = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
-        let rhs = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
+        let lhs = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
+        let rhs = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
         
         // Then: Objects are not equal
         XCTAssertFalse(lhs == rhs)
@@ -63,7 +63,7 @@ final class CoordinatorTests: XCTestCase {
     
     func testEqualityWithSameObjectThenIsEqual() {
         // Given: two different Coordinator instances of the same type
-        let coordinator = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
+        let coordinator = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
         
         let lhs = coordinator
         let rhs = coordinator
@@ -76,8 +76,8 @@ final class CoordinatorTests: XCTestCase {
     
     func testAddChildTwoTimesThenChildrenCountIsEqualToOne() {
         // Given: Coordinator instance and child coordinator
-        let sut   = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
-        let child = Coordinator<Void, UIView, UIViewController>(presenter: UIView())
+        let sut   = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
+        let child = Coordinator<Void, UIView, UIViewController>(presenter: UIView(), dependencies: ())
         
         // When: adding coordinator as child two times
         sut.addChild(child)
@@ -90,9 +90,9 @@ final class CoordinatorTests: XCTestCase {
     
     func testRemoveChildThenChildrenCountIsZero() {
         // Given: Coordinator instance and child coordinator
-        let child = Coordinator<Void, UIView, UIViewController>(presenter: UIView())
+        let child = Coordinator<Void, UIView, UIViewController>(presenter: UIView(), dependencies: ())
         
-        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), children: [child])
+        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), dependencies: (), children: [child])
         XCTAssertEqual(sut.children.count, 1)
         
         // When: adding coordinator as child two times
@@ -105,10 +105,10 @@ final class CoordinatorTests: XCTestCase {
     
     func testRemoveChildThenChildrenCountIsOne() {
         // Given: Coordinator instance with two child coordinators
-        let firstChild  = Coordinator<Void, UIView, UIViewController>(presenter: UIView())
-        let secondChild = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
+        let firstChild  = Coordinator<Void, UIView, UIViewController>(presenter: UIView(), dependencies: ())
+        let secondChild = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
         
-        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), children: [firstChild, secondChild])
+        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), dependencies: (), children: [firstChild, secondChild])
         XCTAssertEqual(sut.children.count, 2)
         
         // When: remove first child coordinator
@@ -123,12 +123,12 @@ final class CoordinatorTests: XCTestCase {
 
     func testRemoveChildrenOwnedByAnotherCoordinatorThenChildrenAreNotRemoved() {
         // Given: Coordinator instance with two child coordinators
-        let firstChild  = Coordinator<Void, UIView, UIViewController>(presenter: UIView())
-        let secondChild = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
+        let firstChild  = Coordinator<Void, UIView, UIViewController>(presenter: UIView(), dependencies: ())
+        let secondChild = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
 
-        let anotherCoordinator = Coordinator<Void, UIView, Void>(presenter: UIView(), children: [firstChild, secondChild])
+        let anotherCoordinator = Coordinator<Void, UIView, Void>(presenter: UIView(), dependencies: (), children: [firstChild, secondChild])
 
-        let sut = Coordinator<Void, UIView, Void>(presenter: UIView())
+        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), dependencies: ())
 
         // When: remove children
         sut.removeChild(firstChild)
@@ -142,10 +142,10 @@ final class CoordinatorTests: XCTestCase {
     
     func testRemoveAllChildrenThenChildrenCountIsZero() {
         // Given: Coordinator instance with two child coordinators
-        let firstChild  = Coordinator<Void, UIView, UIViewController>(presenter: UIView())
-        let secondChild = Coordinator<Void, UIView, UINavigationController>(presenter: UIView())
+        let firstChild  = Coordinator<Void, UIView, UIViewController>(presenter: UIView(), dependencies: ())
+        let secondChild = Coordinator<Void, UIView, UINavigationController>(presenter: UIView(), dependencies: ())
         
-        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), children: [firstChild, secondChild])
+        let sut = Coordinator<Void, UIView, Void>(presenter: UIView(), dependencies: (), children: [firstChild, secondChild])
         XCTAssertEqual(sut.children.count, 2)
         
         // When: remove all children

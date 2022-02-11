@@ -25,7 +25,7 @@ import UIKit
 public typealias StartProtocol = Startable
 
 public protocol Startable {
-    associatedtype StartType
+    associatedtype StartResult
 
-    func start() -> StartType
+    func start() -> StartResult
 }

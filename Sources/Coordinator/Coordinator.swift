@@ -21,20 +21,33 @@
 import CoordinatorAPI
 import UIKit
 
-open class Coordinator<Dependencies, Presenter: UIResponder, StartType>: CoordinatorProtocol, Dismissable, Startable {
+/// A coordinator is an abstract object that has the sole responsibility to coordinate a fragment of an App's overall navigation.
+///
+/// Basically which screen should be shown, what screen should be shown next, etc.
+open class Coordinator<Dependencies, Presenter, Content>: CoordinatorProtocol, Dismissable, Startable {
+    /// The entitiy responsible for responding to events and managing presentation of the receiver.
     open private(set) var presenter: Presenter
 
+    /// The dependencies neeeded for this part of the navigation flow.
     public let dependencies: Dependencies
 
-    open weak var parent: CoordinatorProtocol?
+    /// The parent coordinator of the recipient.
+    ///
+    /// If the recipient is a child of a container coordinator, this property holds the coordinator it is contained in. If the recipient has no parent, the value in this property is nil.
+    /// Prior to iOS 5.0, if a view did not have a parent coordinator and was being presented, the presenting coordinator would be returned. On iOS 5, this behavior no longer occurs. Instead, use the presentingViewController property to access the presenting coordinator.
+    open weak var parent: CoordinatorProtocol? {
+        didSet { if oldValue != nil, parent == nil { dismissHandler?(self) } }
+    }
 
+    /// An array of view controllers that are children of the current view controller.
     open private(set) var children: [CoordinatorProtocol] = []
 
     private let identifier = UUID()
 
-    open var dismissHandler: ((Coordinator<Dependencies, Presenter, StartType>) -> Void)?
+    open var dismissHandler: ((Coordinator<Dependencies, Presenter, Content>) -> Void)?
 
-    open var startObject: StartType!
+    /// The object that will be returned at the start of the navigation flow. Must be injected by overriding the `loadStart()` method on your concrete implementation.
+    open var content: Content!
 
     open private(set) var isStarted = false
 
@@ -51,71 +64,55 @@ open class Coordinator<Dependencies, Presenter: UIResponder, StartType>: Coordin
 
     // MARK: - Start
 
+    /// Creates the flow that the coordinator manages.
+
     /// This method gets called before `start()` is called for the first time.
-    open func loadStart() -> StartType { fatalError("loadStart() not implemented") }
+    open func loadContent() -> Content { fatalError("loadContent() not implemented") }
 
-    /// This method gets called every time `start()` is about to be called.
-    open func willStart() {}
-
-    /// This method gets called every time after `start()` has been called.
-    open func didStart() {}
-
-    open func start() -> StartType {
-        let needsSetup = !isStarted
+    /// Starts the navigation flow and returns its result.
+    open func start() -> Content {
+        if isStarted == false { content = loadContent() }
         isStarted = true
-
-        if needsSetup {
-            startObject = loadStart()
-        }
-        willStart()
-        defer {
-            if needsSetup {
-                didStart()
-            }
-        }
-        return startObject
+        return content
     }
 
     // MARK: - Remove From Parent
 
-    open func willRemoveFromParent() {}
-
-    open func didRemoveFromParent() {}
-
-    public func removeFromParent() {
-        willRemoveFromParent()
-        parent?.removeChild(self)
-        dismissHandler?(self)
-        didRemoveFromParent()
+    /// Removes the coordinator from its parent.
+    ///
+    /// This method is only intended to be called by an implementation of a custom container coordinator.
+    /// If you override this method, you must call super in your implementation.
+    open func removeFromParent() {
+        guard let parent = parent else { return }
+        parent.removeChild(self)
     }
 
     // MARK: - Add Child
 
-    open func willAddChild(_ coordinator: CoordinatorProtocol) {}
-
-    open func didAddChild(_ coordinator: CoordinatorProtocol) {}
-
-    public func addChild(_ coordinator: CoordinatorProtocol) {
+    /// Adds the specified coordinator as a child of the current coordinator.
+    ///
+    /// This method creates a parent-child relationship between the current coordinator and the object in the childController parameter.
+    /// This relationship is necessary when embedding the child coordinator’s view into the current coordinator’s content.
+    /// If the new child coordinator is already the child of a container coordinator, it is removed from that container before being added.
+    /// If you override this method, you must call super in your implementation.
+    open func addChild(_ coordinator: CoordinatorProtocol) {
+        coordinator.removeFromParent()
         coordinator.parent = self
 
         for child in children where child === coordinator {
             return debugLog("⚠️", className, "couldn't add child coordinator. \(coordinator.className) is already added")
         }
 
-        willAddChild(coordinator)
         children.append(coordinator)
-        didAddChild(coordinator)
-
         debugLog("✅", className, "added", coordinator.className, "(\(children.count) children total)")
     }
 
     // MARK: - Remove Child
 
-    open func willRemoveChild(_ coordinator: CoordinatorProtocol) {}
-
-    open func didRemoveChild(_ coordinator: CoordinatorProtocol) {}
-
-    public func removeChild(_ coordinator: CoordinatorProtocol) {
+    /// Removes the specified coordinator as a child of the current coordinator.
+    ///
+    /// If you override this method, you must call super in your implementation.
+    open func removeChild(_ coordinator: CoordinatorProtocol) {
         guard coordinator.parent === self else {
             return debugLog("⚠️", className, "can't remove ", coordinator.className, ", it's owned by \(String(describing: coordinator.parent?.className))")
         }
@@ -123,9 +120,7 @@ open class Coordinator<Dependencies, Presenter: UIResponder, StartType>: Coordin
         coordinator.parent = nil
 
         if let index = children.firstIndex(where: { $0 === coordinator }) {
-            willRemoveChild(coordinator)
             children.remove(at: index)
-            didRemoveChild(coordinator)
             debugLog("🗑", className, "removed", coordinator.className, "\(children.count) children total.")
         }
         else {
@@ -133,22 +128,12 @@ open class Coordinator<Dependencies, Presenter: UIResponder, StartType>: Coordin
         }
     }
 
-    public func removeAllChildren() {
+    open func removeAllChildren() {
         children.forEach { removeChild($0) }
     }
-
 }
 
 // MARK: - Convenience
-
-public extension Coordinator where Dependencies == Void {
-    convenience init(presenter: Presenter,
-                     parent: CoordinatorProtocol? = nil,
-                     children: [CoordinatorProtocol] = [])
-    {
-        self.init(presenter: presenter, dependencies: (), parent: parent, children: children)
-    }
-}
 
 public extension Coordinator where Presenter: UIWindow {
     /// The window that is presenting this Coordinator's start type.
@@ -190,7 +175,7 @@ public extension Coordinator where Presenter: UISceneDelegate {
 import SwiftUI
 
 @available(iOS 13.0, *)
-public extension Coordinator where Presenter: UIHostingController<StartType>, StartType: View {
+public extension Coordinator where Presenter: UIHostingController<StartResult>, StartResult: View {
     var hostingController: Presenter { presenter }
 }
 #endif
@@ -198,7 +183,7 @@ public extension Coordinator where Presenter: UIHostingController<StartType>, St
 // MARK: - Hashable
 
 extension Coordinator: Hashable {
-    public static func == (lhs: Coordinator<Dependencies, Presenter, StartType>, rhs: Coordinator<Dependencies, Presenter, StartType>) -> Bool {
+    public static func == (lhs: Coordinator<Dependencies, Presenter, StartResult>, rhs: Coordinator<Dependencies, Presenter, StartResult>) -> Bool {
         lhs.identifier == rhs.identifier
     }
 
