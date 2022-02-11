@@ -22,10 +22,10 @@ import UIKit
 import CoordinatorAPI
 @testable import Coordinator
 
-final class WindowCoordinatorMock: Coordinator<UIWindow> {
+final class WindowCoordinatorMock: Coordinator<Void, UIView, UIWindow> {
     private(set) lazy var window = UIWindow()
     
-    func start() -> UIWindow {
+    override func start() -> UIWindow {
         window
     }
 }

@@ -22,10 +22,10 @@ import UIKit
 import CoordinatorAPI
 @testable import Coordinator
 
-final class ContainerViewControllerCoordinatorMock: Coordinator<ContainerViewController> {
+final class ContainerViewControllerCoordinatorMock: Coordinator<Void, UIView, ContainerViewController> {
     private(set) lazy var startViewController = ContainerViewController(rootViewController: UIViewController())
     
-    func start() -> ContainerViewController {
+    override func start() -> ContainerViewController {
         startViewController
     }
 }

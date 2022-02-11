@@ -27,8 +27,8 @@ final class SequenceCoordinatorProtocolTests: XCTestCase {
     
     func testWhenFilterNavigationControllerCoordinatorMockThenCountIsOne() {
         // Given: coordinator protocol mock with two children of different types
-        let firstChild  = ViewControllerCoordinatorMock()
-        let secondChild = NavigationControllerCoordinatorMock()
+        let firstChild  = ViewControllerCoordinatorMock(presenter: UIView())
+        let secondChild = NavigationControllerCoordinatorMock(presenter: UIView())
         
         let sut = CoordinatorProtocolMock(children: firstChild, secondChild)
         sut.addChild(firstChild)
@@ -44,8 +44,8 @@ final class SequenceCoordinatorProtocolTests: XCTestCase {
     
     func testWhenLoopForEachNavigationControllerCoordinatorMockThenExecutionCountIsOne() {
         // Given: coordinator protocol mock with two children of different types
-        let firstChild  = ViewControllerCoordinatorMock()
-        let secondChild = NavigationControllerCoordinatorMock()
+        let firstChild  = ViewControllerCoordinatorMock(presenter: UIView())
+        let secondChild = NavigationControllerCoordinatorMock(presenter: UIView())
         
         let sut = CoordinatorProtocolMock(children: firstChild, secondChild)
         sut.addChild(firstChild)

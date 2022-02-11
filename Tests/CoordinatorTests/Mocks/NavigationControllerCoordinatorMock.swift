@@ -22,10 +22,10 @@ import UIKit
 import CoordinatorAPI
 @testable import Coordinator
 
-final class NavigationControllerCoordinatorMock: NavigationCoordinator {
+final class NavigationControllerCoordinatorMock: Coordinator<Void, UIView, UINavigationController> {
     private(set) lazy var startViewController = UINavigationController(rootViewController: UIViewController())
     
-    func start() -> UINavigationController {
+    override func start() -> UINavigationController {
         startViewController
     }
 }

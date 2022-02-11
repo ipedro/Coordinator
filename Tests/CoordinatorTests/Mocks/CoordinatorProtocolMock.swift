@@ -28,11 +28,14 @@ final class CoordinatorProtocolMock: CoordinatorProtocol {
     
     var didAddChild: CoordinatorProtocol?
     
-    var removeAddChild: CoordinatorProtocol?
+    var didRemoveChild: CoordinatorProtocol?
     
-    var removedAllChildren = false
+    var removeFromParentCount = 0
+
+    var removeAllChildrenCount = 0
     
     init(children: CoordinatorProtocol...) {
+        children.forEach{ $0.parent = self }
         self.children = children
     }
     
@@ -41,10 +44,14 @@ final class CoordinatorProtocolMock: CoordinatorProtocol {
     }
     
     func removeChild(_ coordinator: CoordinatorProtocol) {
-        removeAddChild = coordinator
+        didRemoveChild = coordinator
     }
     
     func removeAllChildren() {
-        removedAllChildren = true
+        removeAllChildrenCount += 1
+    }
+
+    func removeFromParent() {
+        removeFromParentCount += 1
     }
 }
