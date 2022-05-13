@@ -179,6 +179,36 @@ public extension Coordinator where Presenter: UIApplication {
     var application: Presenter { presenter }
 }
 
+public extension Coordinator where Presenter: OperationQueue {
+    /// A queue that regulates the execution of this Coordinator's operations.
+    var operationQueue: OperationQueue { presenter }
+}
+
+public extension Coordinator where Presenter == Weak<UIWindow> {
+    /// The window that is presenting this Coordinator's content.
+    var window: UIWindow? { presenter.weakReference }
+}
+
+public extension Coordinator where Presenter == Weak<UINavigationController> {
+    /// The navigation controller that is presenting this Coordinator's content.
+    var navigationController: UINavigationController? { presenter.weakReference }
+}
+
+public extension Coordinator where Presenter == Weak<UISplitViewController> {
+    /// The split view controller that is presenting this Coordinator's content.
+    var splitViewController: UISplitViewController? { presenter.weakReference }
+}
+
+public extension Coordinator where Presenter == Weak<UITabBarController> {
+    /// The tab bar controller that is presenting this Coordinator's content.
+    var tabBarController: UITabBarController? { presenter.weakReference }
+}
+
+public extension Coordinator where Presenter == Weak<UIViewController> {
+    /// The view controller that is presenting this Coordinator's content.
+    var presentingViewController: UIViewController? { presenter.weakReference }
+}
+
 // MARK: - Hashable
 
 extension Coordinator: Hashable {
