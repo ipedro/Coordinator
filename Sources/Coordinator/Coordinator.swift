@@ -25,40 +25,45 @@ import UIKit
 ///
 /// Basically which screen should be shown, what screen should be shown next, etc.
 open class Coordinator<Dependencies, Presenter, Content>: CoordinatorProtocol, Dismissable, Startable {
-    /// The entitiy responsible for responding to events and managing presentation of the receiver.
-    open private(set) var presenter: Presenter
+    public typealias _Self = Coordinator<Dependencies, Presenter, Content>
 
     /// The dependencies neeeded for this part of the navigation flow.
     public let dependencies: Dependencies
+
+    /// The entitiy responsible for managing the presentation of the receiver's content.
+    public let presenter: Presenter
 
     /// The parent coordinator of the recipient.
     ///
     /// If the recipient is a child of a container coordinator, this property holds the coordinator it is contained in. If the recipient has no parent, the value in this property is nil.
     /// Prior to iOS 5.0, if a view did not have a parent coordinator and was being presented, the presenting coordinator would be returned. On iOS 5, this behavior no longer occurs. Instead, use the presentingViewController property to access the presenting coordinator.
     open weak var parent: CoordinatorProtocol? {
-        didSet { if oldValue != nil, parent == nil { dismissHandler?(self) } }
+        didSet {
+            if oldValue != nil, parent == nil { dismissHandler?(self) }
+        }
     }
 
     /// An array of view controllers that are children of the current view controller.
-    open private(set) var children: [CoordinatorProtocol] = []
+    open private(set) var children: [CoordinatorProtocol]
 
-    private let identifier = UUID()
-
-    open var dismissHandler: ((Coordinator<Dependencies, Presenter, Content>) -> Void)?
+    open var dismissHandler: ((_Self) -> Void)?
 
     /// The object that will be returned at the start of the navigation flow. Must be injected by overriding the `loadStart()` method on your concrete implementation.
     open var content: Content!
 
     open private(set) var isStarted = false
 
-    public init(presenter: Presenter,
-                dependencies: Dependencies,
-                parent: CoordinatorProtocol? = nil,
-                children: [CoordinatorProtocol] = [])
-    {
+    public init(
+        _ dependencies: Dependencies,
+        presentedBy presenter: Presenter,
+        parent: CoordinatorProtocol? = nil,
+        children: [CoordinatorProtocol] = []
+    ) {
         self.dependencies = dependencies
         self.presenter = presenter
         self.parent = parent
+        self.children = children
+
         children.forEach { addChild($0) }
     }
 
@@ -67,11 +72,17 @@ open class Coordinator<Dependencies, Presenter, Content>: CoordinatorProtocol, D
     /// Creates the flow that the coordinator manages.
 
     /// This method gets called before `start()` is called for the first time.
-    open func loadContent() -> Content { fatalError("loadContent() not implemented") }
+    open func loadContent() -> Content? { .none }
 
     /// Starts the navigation flow and returns its result.
     open func start() -> Content {
-        if isStarted == false { content = loadContent() }
+        if isStarted == false {
+            content = loadContent()
+
+            if Content.self == Void.self {
+                content = () as? Content
+            }
+        }
         isStarted = true
         return content
     }
@@ -136,59 +147,47 @@ open class Coordinator<Dependencies, Presenter, Content>: CoordinatorProtocol, D
 // MARK: - Convenience
 
 public extension Coordinator where Presenter: UIWindow {
-    /// The window that is presenting this Coordinator's start type.
-    var presentingWindow: Presenter { presenter }
+    /// The window that is presenting this Coordinator's content.
+    var window: Presenter { presenter }
 }
 
 public extension Coordinator where Presenter: UINavigationController {
-    /// The navigation controller that is presenting this Coordinator's start type.
-    var presentingNavigationController: Presenter { presenter }
+    /// The navigation controller that is presenting this Coordinator's content.
+    var navigationController: Presenter { presenter }
 }
 
 public extension Coordinator where Presenter: UISplitViewController {
-    /// The split view controller that is presenting this Coordinator's start type.
-    var presentingSplitViewController: Presenter { presenter }
+    /// The split view controller that is presenting this Coordinator's content.
+    var splitViewController: Presenter { presenter }
 }
 
 public extension Coordinator where Presenter: UITabBarController {
-    /// The tab bar controller that is presenting this Coordinator's start type.
-    var presentingTabBarController: Presenter { presenter }
+    /// The tab bar controller that is presenting this Coordinator's content.
+    var tabBarController: Presenter { presenter }
 }
 
 public extension Coordinator where Presenter: UIViewController {
-    /// The view controller that is presenting this Coordinator's start type.
+    /// The view controller that is presenting this Coordinator's content.
     var presentingViewController: Presenter { presenter }
 }
 
-public extension Coordinator where Presenter: UIApplicationDelegate {
-    /// The application delegate that is presenting this Coordinator's start type.
-    var applicationDelegate: Presenter { presenter }
-}
+public extension Coordinator where Presenter: UIApplication {
+    /// The application delegate that is presenting this Coordinator's content.
+    var appDelegate: UIApplicationDelegate? { presenter.delegate }
 
-@available(iOS 13.0, *)
-public extension Coordinator where Presenter: UISceneDelegate {
-    /// The scene delegate that is presenting this Coordinator's start type.
-    var sceneDelegate: Presenter { presenter }
+    /// The application delegate that is presenting this Coordinator's content.
+    var application: Presenter { presenter }
 }
-
-#if canImport(SwiftUI)
-import SwiftUI
-
-@available(iOS 13.0, *)
-public extension Coordinator where Presenter: UIHostingController<StartResult>, StartResult: View {
-    var hostingController: Presenter { presenter }
-}
-#endif
 
 // MARK: - Hashable
 
 extension Coordinator: Hashable {
     public static func == (lhs: Coordinator<Dependencies, Presenter, StartResult>, rhs: Coordinator<Dependencies, Presenter, StartResult>) -> Bool {
-        lhs.identifier == rhs.identifier
+        ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier)
+        hasher.combine(ObjectIdentifier(self))
     }
 }
 
