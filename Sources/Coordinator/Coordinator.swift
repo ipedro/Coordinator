@@ -67,6 +67,15 @@ open class Coordinator<Dependencies, Presenter, Content>: CoordinatorProtocol, D
         children.forEach { addChild($0) }
     }
 
+    public convenience init<WeakPresenter>(
+        _ dependencies: Dependencies,
+        weaklyPresentedBy presenter: WeakPresenter,
+        parent: CoordinatorProtocol? = nil,
+        children: [CoordinatorProtocol] = []
+    ) where Presenter == Weak<WeakPresenter> {
+        self.init(dependencies, presentedBy: Weak(presenter), parent: parent, children: children)
+    }
+
     // MARK: - Start
 
     /// Creates the flow that the coordinator manages.
